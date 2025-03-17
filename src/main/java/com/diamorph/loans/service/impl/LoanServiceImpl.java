@@ -37,7 +37,7 @@ public class LoanServiceImpl implements ILoansService {
 
     @Override
     public boolean updateLoan(LoansDto loansDto) {
-        Loans loans = this.findLoansByMobileNumberOrThrowResourceNotFoundException(loansDto.getMobileNumber());
+        Loans loans = this.findLoansByLoanNumberOrThrowResourceNotFoundException(loansDto.getLoanNumber());
         Loans updatedLoans = LoansMapper.mapToLoans(loansDto, loans);
         loansRepository.save(updatedLoans);
         return true;
@@ -46,13 +46,18 @@ public class LoanServiceImpl implements ILoansService {
     @Override
     public boolean deleteLoan(String mobileNumber) {
         Loans loans = this.findLoansByMobileNumberOrThrowResourceNotFoundException(mobileNumber);
-        loansRepository.deleteByLoanId(loans.getLoanId());
+        loansRepository.deleteById(loans.getLoanId());
         return true;
     }
 
     private Loans findLoansByMobileNumberOrThrowResourceNotFoundException(String mobileNumber) {
         return loansRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Loan", "mobileNumber", mobileNumber));
+    }
+
+    private Loans findLoansByLoanNumberOrThrowResourceNotFoundException(String loanNumber) {
+        return loansRepository.findByLoanNumber(loanNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Loan", "loanNumber", loanNumber));
     }
 
     private Loans createNewLoan(String mobileNumber) {
